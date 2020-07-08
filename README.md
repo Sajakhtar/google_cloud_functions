@@ -35,6 +35,8 @@ In order to add new packages to our virtual environment, create a file `requirem
 
 `requirements.txt` should contain:
 * `functions-framework`
+This is a package to test Google Cloud Functions locally. It installs Flask as a dependancy.
+
 
 To add new packages to `venv`, execute:
 ```
@@ -45,3 +47,36 @@ May need to also install:
 pip install wheel
 ```
 
+## Test Cloud Function locally
+To test a Google Cloud Function locally, from your application folder, run:
+```
+functions-framework --target my_function
+```
+or allow for server to update automatically if changes are made tto my_function
+```
+functions-framework --target my_function --debug
+```
+
+Then navigate to `http://localhost:8080/` or `http://127.0.0.1:8080/`, not `http://0.0.0.0:8080/`, for Windows at least.
+
+See [docs](https://github.com/GoogleCloudPlatform/functions-framework-python) and [troubleshooting](https://stackoverflow.com/questions/53693987/test-python-google-cloud-functions-locally)
+
+Test the function endpoing using `GET` requests in Postman with the endpoint URL or `POST` requests with raw json
+
+You can test functions that have parameters by using query parameters on the end point `http://127.0.0.1:8080/?name=jon&lastname=snow` or using JSON `{"name":"iron","lastname":"man"}`
+
+## Deploying Google Cloud Function
+
+Install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/downloads-versioned-archives). For Windows [isntallaltion](https://cloud.google.com/sdk/docs/downloads-interactive) and [quick start](https://cloud.google.com/sdk/docs/quickstart-windows)
+
+
+Google Cloud SDK commands in the Google Cloud SDK Shell or Cloud Tools for Powershell :
+* initialize project: `gcloud init`
+* List projects: `gcloud projects list`
+* Set/change project: `gcloud config set project prject_name` (First, set set project ID to which you want to deploy the functions)
+* Deploy Cloud Function: `gcloud functions deploy function_name --runtime python37 --trigger-http` (Google Cloud only supports Python 3.7, and python file must be `main.py`)
+
+
+## Security
+
+We need to add security to our Cloud Function, else anyone can access the endpoint and send millions of requests, leading toa costly GCP bill
