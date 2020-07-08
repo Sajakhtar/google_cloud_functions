@@ -76,7 +76,4 @@ Google Cloud SDK commands in the Google Cloud SDK Shell or Cloud Tools for Power
 * Set/change project: `gcloud config set project prject_name` (First, set set project ID to which you want to deploy the functions)
 * Deploy Cloud Function: `gcloud functions deploy function_name --runtime python37 --trigger-http` (Google Cloud only supports Python 3.7, and python file must be `main.py`)
 
-
-## Security
-cd
-We need to add security to our Cloud Function, else anyone can access the endpoint and send millions of requests, leading to a costly GCP bill
+A note on Security: While deploying the Cloud Functions as unauthenticated is easy, we need to add security to our Cloud Function, else anyone can access the endpoint and send millions of requests. This could lead to fraudulent requests and therefore a costly GCP bill.
