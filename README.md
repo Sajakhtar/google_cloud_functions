@@ -155,4 +155,34 @@ Deploy as before.
 
 ### Scheduling
 
+In the project root directory, run
+* `gcloud components install beta`
+* `gcloud components update`
+* Then we will create a topic to Pub/Sub: `gcloud pubsub topics create cloud-function-test`
+* Subscribe to the topic: `gcloud pubsub subscriptions create cron-sub --topic cloud-function-test`
+
+In the GCP console go to [Cloud Scheduler](https://console.cloud.google.com/cloudscheduler)
+
+Create Job >>
+* Name: set-expense
+* Descrition: cloud function to create documents with random data
+* Frequency: */2 * * * *
+    * Takes the chrontab format
+    * [chrontab field](https://man7.org/linux/man-pages/man5/crontab.5.html)
+    * 5 fields: min, hour, day of month, month, day of week
+    * Use [Chrontab Guru](https://crontab.guru/) to workout the syntax
+    * syntax for [every 2 mins](https://crontab.guru/every-2-minutes)
+* Timezone
+* Target: HTTP
+    * URL: paste the `set_expense` Cloud Function endpoint
+    * HTTP Method: GET
+
+
+## Deleting Cloud Functions
+
+In the project root directory, run
+```
+gcloud functions delete function_name
+```
+
 
