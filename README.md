@@ -113,9 +113,13 @@ Using the python console in the terminal, run
 
 Add the outputted bearer token as a variable in the .env file.
 
-## Firestore Database Project
+### Locally test Function
 
-## Create Firebase project
+In the emails directory, run `functions-framework --target send_mail --debug`
+
+## Scheduling Google Cloud Functions
+
+### Create Firebase project and Firestore Database
 
 Create [Firebase project](https://console.firebase.google.com/) using the underlying GCP projects used for the previous functions.
 
@@ -123,6 +127,32 @@ Enable the Firestore Database.
 
 Navigate to Project Settings > Service Accounts > Generate key>>
 
-Download the JSON file, store in the project root directory and add the file to .gitignore
+Download the JSON file, store in the project root directory and add the file to .gitignore.
+
+
+### Firebase SDK Python
+
+In Firebase, navigate to Firestore database.
+
+* Start a collection named `expenses`.
+* Add fields
+    * createdAt = timestamp, select today's date
+    * expense = number, value = 100
+
+We'll create a cloud function that when invoked, it will create a document with a random ID with the date and expense fields
+
+Add `firebase-admin` to the requirementst.txt file in the project root and the `expense` directory. Then run `pip install -r requirements.txt` at the project root level.
+
+Add `python-dotenv` to the `requirements.txt` in the `expenses` directory as well.
+
+
+### Locally test Function and Deploy
+
+In the expenses directory, run `functions-framework --target set_expense --debug`
+
+Deploy as before.
+
+
+### Scheduling
 
 

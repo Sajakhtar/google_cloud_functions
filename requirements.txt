@@ -2,3 +2,4 @@ functions-framework
 sendgrid
 python-dotenv
 sib-api-v3-sdk
+firebase-admin
