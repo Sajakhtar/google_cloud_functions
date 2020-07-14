@@ -113,3 +113,16 @@ Using the python console in the terminal, run
 
 Add the outputted bearer token as a variable in the .env file.
 
+## Firestore Database Project
+
+## Create Firebase project
+
+Create [Firebase project](https://console.firebase.google.com/) using the underlying GCP projects used for the previous functions.
+
+Enable the Firestore Database.
+
+Navigate to Project Settings > Service Accounts > Generate key>>
+
+Download the JSON file, store in the project root directory and add the file to .gitignore
+
+
