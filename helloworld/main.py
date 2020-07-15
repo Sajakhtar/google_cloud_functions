@@ -20,7 +20,7 @@ def hello_world(request):
     # returns a dictionary or none
     request_args = request.args
 
-    # silen= True sents the var to none, if no json object is present
+    # silent= True sets the var to none, if no json object is present
     request_json = request.get_json(silent=True)
 
 

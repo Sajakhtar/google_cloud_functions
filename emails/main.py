@@ -1,35 +1,61 @@
-def send_mail(request):   
+# To access environment variables (Api Key) in Windows
+import os
+from dotenv import load_dotenv
+load_dotenv()
+api_key = os.getenv('SENDGRID_API_KEY')
 
-    # ---------------------------
-    # Send Transactional Email\
-    # ---------------------------
-    from __future__ import print_function
-    import time
-    import sib_api_v3_sdk
-    from sib_api_v3_sdk.rest import ApiException
-    from pprint import pprint
 
-    # A ccess environment variables    
-    from dotenv import load_dotenv
-    load_dotenv()
-    import os
-    api_key = os.getenv("SENDINBLUE_API_KEY") # os.environ.get("SENDINBLUE_API_KEY") 
+def send_mail(request):
+        
+    # using SendGrid's Python Library
+    # https://github.com/sendgrid/sendgrid-python
+    #import os
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail
 
-    # Configure API key authorization: api-key
-    configuration = sib_api_v3_sdk.Configuration()
-    configuration.api_key['api-key'] = api_key
+    # To access environment variables (Api Key) in Windows
+    # from dotenv import load_dotenv
+    # load_dotenv()
 
-    # Uncomment below lines to configure API key authorization using: partner-key
-    # configuration = sib_api_v3_sdk.Configuration()
-    # configuration.api_key['partner-key'] = 'YOUR_API_KEY'
+    # import Abort function from Flask
+    from flask import abort
 
-    # create an instance of the API class
-    api_instance = sib_api_v3_sdk.SMTPApi(sib_api_v3_sdk.ApiClient(configuration))
-    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=[{"email":"johndoe@gmail.com","name":"John Doe"}], template_id=2, params={"name": "John", "surname": "Doe"}, headers={"X-Mailin-custom": "custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3", "charset": "iso-8859-1"}) # SendSmtpEmail | Values to send a transactional email
+    # Verify request JSON
+    # silent= True sets the var to none, if no json object is present
+    request_json = request.get_json(silent=True)
 
+    # Tuple of email params
+    parameters = ('sender', 'receiver', 'subject', 'message')
+
+    # initialize variables as empty strings
+    sender, receiver, subject, message = '', '', '', ''
+
+    # check if there is data in the request_json (check if all params in request_json)
+    if request_json and all(k in request_json for k in parameters):
+        sender = request_json['sender']
+        receiver = request_json['receiver']
+        subject = request_json['subject']
+        message = request_json['message']
+    else:
+        abort(400) # 400 Bad Request Status Code
+
+    # Set Mail Object
+    message = Mail(
+        from_email=sender,
+        to_emails=receiver,
+        subject=subject,
+        html_content=message
+    )
+
+    # Sendgrid API request
     try:
-        # Send a transactional email
-        api_response = api_instance.send_transac_email(send_smtp_email)
-        pprint(api_response)
-    except ApiException as e:
-        print(f'Exception when calling SMTPApi->send_transac_email: {e}\n')
+        #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(api_key)
+        sg.send(message)
+        return 'OK', 200 # 200 OK Status Code
+    except Exception as e:
+        return e, 400 # error msg and 400 Bad Request Status Code 
+    
+
+
+

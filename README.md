@@ -73,8 +73,8 @@ Install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/downloads-versi
 Google Cloud SDK commands in the Command Prompt (Google Cloud SDK Shell or Cloud Tools for Powershell) :
 * Initialize GCP account: `gcloud init`
 * List projects: `gcloud projects list`
-* Set/change project: `gcloud config set project prject_name` (First, set set project ID to which you want to deploy the functions)
-* Deploy Cloud Function: `gcloud functions deploy function_name --runtime python37 --trigger-http` (Google Cloud only supports Python 3.7, and python file must be `main.py`)
+* Set/change project: `gcloud config set project PROJECT_NAME` (First, set set project ID to which you want to deploy the functions)
+* Deploy Cloud Function: `gcloud functions deploy FUNCTION_NAME --runtime python37 --trigger-http` (Google Cloud only supports Python 3.7, and python file must be `main.py`)
 
 The cloud function will apprear int he [GCP Console](https://console.cloud.google.com/functions/list)
 
@@ -82,28 +82,65 @@ A note on Security: While deploying the Cloud Functions as unauthenticated is ea
 
 ## Emails Project
 
-Using sendinblue.com as sendgrid.com account requires manual authorization, which may take some time.
+Sign up for a free account on [Sendgrid](sendgrid.com).
 
-[Sendinblue API docs](https://github.com/sendinblue/APIv3-python-library)
+Navigate to Email API > Integration Guide > Web API > Python.
+
+Generate API Key.
+
 
 ### Environment Variables for API keys
 
-Create a .env file in the project root directory to `export API_KEY=api_string`.
+Create a .env file in the project root directory to `export API_KEY=api_string`. Copy and past the Sendgrid API key in the .env file.
+
+Add `.env` to .gitignore. 
 
 In Linux we can use `source .env`, however, in windows we'll have to create a settings.py file and [`pip install -U python-dotenv`](https://github.com/theskumar/python-dotenv), and in order to "source" the .env file, run settings.py first to set all environment variables.
 
 Environment variables can then be referenced in main.py as os.getenv("variable_name").
 
 
-### Sendinblue API
+### Sendgrid API dependancies
 
-Add `sib-api-v3-sdk` to requirements.txt
+Add `sendgrid` to requirements.txt
 
 run `pip install -r requirements.txt` to install all the dependencies.
+
+
+### Define Cloud Function in main.py
+
+Use the example minimum code from the sendgrid guide.
+
+### Http codes
+
+We'll use [Https status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) for various states:
+* 400 Bad Request if something goes wrong
+* 200 OK for successful requests
+
 
 ### Testing Emails Cloud Function
 
 `functions-framework --target send_mail --debug`
+
+or
+
+`functions-framework --target send_mail`
+
+Navigating to http://127.0.0.1:8080/ or http://localhost:8080/ in the browser to invoke the Cloud Function will give a 400 Bad Request status, becuase the Cloud Function is expection a JSON object with sender, receiver, subject and message parameters.
+
+We can't invoke the Cloud Function from the browsers, but we can test it via Postman, by providing a JSON object with the correct parameters in a POST request to http://127.0.0.1:8080/ or http://localhost:8080/ endpoint.
+
+
+{
+	"sender":"jon.snow@gmail.com",
+	"receiver":"john.doe@gmail.com",
+	"subject":"sendgrid API test",
+	"message":"sendgrid API test from a cloud function local test"
+}
+
+### CONTINUE HERE
+
+
 
 ### Adding security via Bearer token
 
@@ -116,6 +153,7 @@ Add the outputted bearer token as a variable in the .env file.
 ### Locally test Function
 
 In the emails directory, run `functions-framework --target send_mail --debug`
+
 
 ## Scheduling Google Cloud Functions
 
@@ -189,7 +227,7 @@ Select a Cloud Function and navigate to the `Trigger` tab and copy the endpoint 
 In a new browser tab, use the developer tools Console to fetch the endpoint using JavsScript, using the fetch method:
 
 ```
-fetch(`Cloud Functions endpoint`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
+fetch(`CLOUD FUNCTIONS ENDPOINT`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
 ```
 
 Notes
@@ -218,11 +256,11 @@ headers = {
 }
 ```
 
-Redeploy the Cloud Function `gcloud functions deploy function_name --runtime python37 --trigger-http`
+Redeploy the Cloud Function `gcloud functions deploy FUNCTION_NAME --runtime python37 --trigger-http`
 
 Then retest the JavaScript code in the Console of a new browser tab and this time there will be no CORS error and we'll get the expected response from the Cloud Function.
 ```
-fetch(`Cloud Functions endpoint`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
+fetch(`CLOUD FUNCTIONS ENDPOINT`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
 ```
 
 ## Deleting Cloud Functions

@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import firestore
 
-# A ccess environment variables    
+# Access environment variables    
 from dotenv import load_dotenv
 load_dotenv()
 import os
