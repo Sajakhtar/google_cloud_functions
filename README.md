@@ -177,6 +177,53 @@ Create Job >>
     * URL: paste the `set_expense` Cloud Function endpoint
     * HTTP Method: GET
 
+The Cloud Function will now run at the frequency specified
+
+
+## Adding CORS to a Cloud Function
+
+In the GCP Console, navigate to the [Cloud Functions](https://console.cloud.google.com/functions).
+
+Select a Cloud Function and navigate to the `Trigger` tab and copy the endpoint URL.
+
+In a new browser tab, use the developer tools Console to fetch the endpoint using JavsScript, using the fetch method:
+
+```
+fetch(`Cloud Functions endpoint`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
+```
+
+Notes
+* Content-Type specifies the format of the data we're sending
+* fetch() is a promise, so we call the .then() method for the response we expect to receive
+* When we run this JavaScript in the console, we will get a CORS error
+    * Access to fetch at '*Clound Function endpoint*' from origin 'chrome-search://local-ntp' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource
+* The browser is sending a request to the Cloud Function endpoint with a method called *OPTIONS*, the server has to return some headers and in the headers there has to be 'Access-Control-Allow-Origin' present
+
+The solution is to modify the Cloud Function main.py file with the following pre-flight request code that occurs before the main request (purpose of the function)
+```
+# Pre-flight request for CORS
+if request.method == 'OPTIONS':
+    headers = {
+        'Access-Control-Allow-Origin': '*', # access from specific domains or * for all domains
+        'Access-Control-Allow-Methods': 'POST', # access via any method '*'
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '3600' # remember headers for 1hr (3600 secs) for future requests
+    }
+    return '', 204, headers
+    # 204 status means No Content
+
+# Set headers for CORS
+headers = {
+    'Access-Control-Allow-Origin': '*'
+}
+```
+
+Redeploy the Cloud Function `gcloud functions deploy function_name --runtime python37 --trigger-http`
+
+Then retest the JavaScript code in the Console of a new browser tab and this time there will be no CORS error and we'll get the expected response from the Cloud Function.
+```
+fetch(`Cloud Functions endpoint`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'name':'Jon','lastname':'Snow'})}).then(response => response.text()).then(result => console.log(result))
+```
 
 ## Deleting Cloud Functions
 

@@ -27,11 +27,11 @@ def set_expense(request):
         # set document data
         ref.set({'createdAt': datetime.now(), 'expense': random.randint(1,200)})
 
-        # status code for success
+        # status code for OK
         return 'OK', 200
 
     except Exception as e:
-        # status code for error
+        # status code for Bad Request
         return e, 400
 
 

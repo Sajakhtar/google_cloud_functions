@@ -1,5 +1,22 @@
 def hello_world(request):
+
+    # Pre-flight request for CORS
+    if request.method == 'OPTIONS':
+        headers = {
+            'Access-Control-Allow-Origin': '*', # access from specific domains or * for all domains
+            'Access-Control-Allow-Methods': 'POST', # access via any method '*'
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600' # remember headers for 1hr (3600 secs) for future requests
+        }
+        return '', 204, headers
+        # 204 status means No Content
     
+    # Set headers for CORS
+    headers = {
+        'Access-Control-Allow-Origin': '*'
+    }
+
+
     # returns a dictionary or none
     request_args = request.args
 
@@ -17,4 +34,5 @@ def hello_world(request):
         name = 'World'
         lastname = ''
 
-    return f'Hello {name} {lastname}'
+    return f'Hello {name} {lastname}', 200, headers
+    # 200 status code for OK
