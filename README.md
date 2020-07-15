@@ -169,7 +169,7 @@ To deploy the Cloud Function, from the emails directory, run
 gcloud functions deploy send_mail --env-vars-file .env.yaml --runtime python37 --trigger-http
 ```
 
-Test the Cloud Function endpoint using Postman as before, using a POST request, specifiying the the JSON body as follows and a Authorization header with the Bearer Token
+Test the Cloud Function endpoint using Postman as before, using a POST request, specifiying the the JSON body as follows:
 ```
 {
 	"sender":"jon.snow@gmail.com",
@@ -178,6 +178,11 @@ Test the Cloud Function endpoint using Postman as before, using a POST request, 
 	"message":"sendgrid API test from a cloud function local test"
 }
 ```
+
+And Headers as follows:
+* `Authorization` header with the Bearer Token value as `Bearer #########`
+* `Content-Type` header with value `application/json`
+
 
 ## Scheduling Google Cloud Functions
 
