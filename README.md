@@ -177,7 +177,7 @@ Test the Cloud Function endpoint using Postman as before, using a POST request, 
 	"subject":"sendgrid API test",
 	"message":"sendgrid API test from a cloud function local test"
 }
-
+```
 
 ## Scheduling Google Cloud Functions
 
