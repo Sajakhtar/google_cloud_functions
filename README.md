@@ -120,6 +120,8 @@ We'll use [Https status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP
 
 ### Testing Emails Cloud Function
 
+In the emails directory run:
+
 `functions-framework --target send_mail --debug`
 
 or
@@ -130,29 +132,51 @@ Navigating to http://127.0.0.1:8080/ or http://localhost:8080/ in the browser to
 
 We can't invoke the Cloud Function from the browsers, but we can test it via Postman, by providing a JSON object with the correct parameters in a POST request to http://127.0.0.1:8080/ or http://localhost:8080/ endpoint.
 
-
+```
 {
 	"sender":"jon.snow@gmail.com",
 	"receiver":"john.doe@gmail.com",
 	"subject":"sendgrid API test",
 	"message":"sendgrid API test from a cloud function local test"
 }
+```
 
-### CONTINUE HERE
+### Adding basic security to Cloud Function 
+
+Basic security will be added using a bearer token and by limiting the methods allowed when sending requests to only POST.
 
 
-
-### Adding security via Bearer token
-
-Using the python console in the terminal, run
+Create a Bearer token using the python console in the terminal, run
 `>>> import secrets`
 `>>> secrets.token_hex(16)`
 
 Add the outputted bearer token as a variable in the .env file.
 
-### Locally test Function
+Locally test Function as before using Postman, but this time specifiying the Bearer Token in the authorization headers.
 
-In the emails directory, run `functions-framework --target send_mail --debug`
+Improve the way to get the Bearer Token by created a separate function.
+
+### Deploying Cloud Functions with environment variables
+
+In the emails directory create (same directory as main.py for the cloud function in question)
+* a `requirements.txt` with the `python-dotenv`, `sendgrid` and `flask` dependancies
+    * `flask` is not required in the `requirements.txt` within the project root, since the `functions-framework` dependancy installs flask anyway 
+* a .env.yaml file with the `SENDGRID_API_KEY:` and `ACCESS_TOKEN`
+* add `emails/.env.yaml` to .gitignore
+
+To deploy the Cloud Function, from the emails directory, run
+```
+gcloud functions deploy send_mail --env-vars-file .env.yaml --runtime python37 --trigger-http
+```
+
+Test the Cloud Function endpoint using Postman as before, using a POST request, specifiying the the JSON body as follows and a Authorization header with the Bearer Token
+```
+{
+	"sender":"jon.snow@gmail.com",
+	"receiver":"john.doe@gmail.com",
+	"subject":"sendgrid API test",
+	"message":"sendgrid API test from a cloud function local test"
+}
 
 
 ## Scheduling Google Cloud Functions

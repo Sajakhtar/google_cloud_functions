@@ -3,6 +3,29 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv('SENDGRID_API_KEY')
+secret_key = os.getenv('ACCESS_TOKEN')
+
+# import Abort function from Flask
+from flask import abort
+
+
+def get_bearer_token(request):
+    bearer_token = request.headers.get('Authorization', None)
+    if not bearer_token:
+        abort(401) # 401 Unauthorized Status Code
+    parts = bearer_token.split()
+    if parts[0].lower() != "bearer":
+        # authorization header must start with 'Bearer'
+        abort(401) # 401 Unauthorized Status Code
+    elif len(parts) == 1:
+        # token was not found
+        abort(401) # 401 Unauthorized Status Code
+    elif len(parts) > 2:
+        # authorization header must be of the form 'Bearer token'
+        abort(401) # 401 Unauthorized Status Code
+    bearer_token = parts[1]
+    return bearer_token
+
 
 
 def send_mail(request):
@@ -18,7 +41,19 @@ def send_mail(request):
     # load_dotenv()
 
     # import Abort function from Flask
-    from flask import abort
+    #from flask import abort
+
+    # Basic Security - allow only POST method requests
+    if request.method != 'POST':
+        abort(405) # 405 Method Not Allowed Status Code
+
+    # Get Bearer Token from the request headers
+    #bearer_token = request.headers.get('Authorization').split()[1] # split 'Bearer #####' to get token only
+    bearer_token = get_bearer_token(request)
+
+    # check Bearer Token from request matches Access Token in environment variables
+    if bearer_token != secret_key:
+        abort(401) # 401 Unauthorized Status Code
 
     # Verify request JSON
     # silent= True sets the var to none, if no json object is present
